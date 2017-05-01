@@ -578,7 +578,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
     private void doActionsWhenCollide(MySprite mObject1, MySprite mObject2) {
 
         increaseNbCollideIfBouceOn();
-        
+
         setTouchedOnXY(mObject1);
         setRandomBitmapForMSprite(mObject1);
         setRandomSpeedForPicIfActivated(mObject1);
@@ -592,7 +592,6 @@ public class MyCustomView extends View implements View.OnTouchListener {
     }
 
     /**
-     *
      * @param mObject1
      */
     private void setTouchedOnXY(MySprite mObject1) {
@@ -632,7 +631,6 @@ public class MyCustomView extends View implements View.OnTouchListener {
      */
     private Boolean doActionWhenClickOnMySprite(int x, int y, int id) {
 
-        setDefaultBitmapForAllPic(tabPics);
 //                reDrawPicFuther(tabPics.get(i));
 //                playSoundCollideWow();
         tabPics.get(id).setmBitmap(getRandomBitmap());
@@ -670,6 +668,8 @@ public class MyCustomView extends View implements View.OnTouchListener {
 //                    reDrawMySelectedMySpriteHere(x, y);
                 }*/
                 return true;
+            } else {
+                setDefaultBitmapForAllPic(tabPics);
             }
         }
         return null;
