@@ -1,0 +1,40 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.sebastien.granarolo.myanim.HomeFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+
+<!--    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="openActivity"
+        android:text="@string/open_text"
+        android:layout_margin="60dp"/>
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="openOtherApp"
+        android:layout_gravity="center"
+        android:text="@string/open_text2" />-->
+
+    <com.sebastien.granarolo.myanim.view.MyCustomView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <!--<ImageView-->
+        <!--android:id="@+id/imageToPdf"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:srcCompat="@android:drawable/btn_star_big_on"-->
+        <!--android:layout_gravity="bottom"-->
+        <!--android:onClick="goToPdf"/>-->
+
+
+</FrameLayout>
