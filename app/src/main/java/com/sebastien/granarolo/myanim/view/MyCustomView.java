@@ -1294,7 +1294,10 @@ public class MyCustomView extends View implements View.OnTouchListener {
 
     }
 
-
+    /**
+     *
+     * @param nbIncrease
+     */
     private void increaseSpeed(int nbIncrease) {
         for (int i = 0; i <= tabPics.size() - 1; i++) {
 
@@ -1307,6 +1310,10 @@ public class MyCustomView extends View implements View.OnTouchListener {
         }
     }
 
+    /**
+     * 
+     * @param nbDecrease
+     */
     private void decreaseSpeed(int nbDecrease) {
 
         for (int i = 0; i <= tabPics.size() - 1; i++) {
