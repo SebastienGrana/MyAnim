@@ -577,6 +577,8 @@ public class MyCustomView extends View implements View.OnTouchListener {
      */
     private void doActionsWhenCollide(MySprite mObject1, MySprite mObject2) {
 
+        increaseNbCollideIfBouceOn();
+        
         setTouchedOnXY(mObject1);
         setRandomBitmapForMSprite(mObject1);
         setRandomSpeedForPicIfActivated(mObject1);
@@ -587,11 +589,10 @@ public class MyCustomView extends View implements View.OnTouchListener {
         setRandomSpeedForPicIfActivated(mObject2);
         reDrawPicWhenCollideIfActivated(mObject2);
 
-        increaseNbCollideIfBouceOn();
     }
 
     /**
-     * 
+     *
      * @param mObject1
      */
     private void setTouchedOnXY(MySprite mObject1) {
