@@ -30,18 +30,27 @@ import java.util.logging.Handler;
  * Created by hb on 12/04/2017.
  */
 /*
-*
-* Ceci est une class d'une View Personnaliser
-* Apparement ça sert a pouvoir faire des annimations, pouvoir crée a la volé des TextView ImageView etc.. à débatre ... =)
-*/
+
+
+        //TODO faire objet Plateau de jeu, pour pouvoir avoir d'autre "Images" que celle de base
+        //TODO Tableau a deux dimention. une ligne pour chaque tableau de "MySprites"
+        //TODO ex: plateau.getTabsSprites(0,0).getXStart
+
+        //TODO Faire le Controller dans Le mvC !!
+        //TODO Ne pas utiliser de variable de classe, tout passer en parrametre de la fonction !!!
+        //TODO implémenter: le nouveau system de détection de colision, le nouveau system de déplacement, les angles des mySprite, la vitesse en float et le poid
+
+        //TODO refaire les méthodes de drawMyMenu et onClickOnMyMenu de simplement
+
+ */
 public class MyCustomView extends View implements View.OnTouchListener {
 
     private static final String TAG = "MyCustomView";
     public static final int myMenuWidth = 50;
     public static final int mMarginPic = 10;
-    private int screenWidth;            //Des dimentions pour récup la taille de l'écrans
+    private int screenWidth;
     private int screenHeight;
-    private Paint mPaint;               //Object Paint qui sert a pouvoir afficher des elements, comme : TextView ImageView etc ... c'est cool!
+    private Paint mPaint;
     private Paint mPaint2;
 
     private Bitmap mBitmapSpriteRed;
@@ -70,62 +79,8 @@ public class MyCustomView extends View implements View.OnTouchListener {
     private MyBtn redrawSelectedPic;
     private MyBtn changeColor;
 
-    private Bitmap mBitmapIcShowDebugScreenOn;
-    private Bitmap mBitmapIcShowDebugScreenOff;
-
-    private Bitmap mBitmapIcMakeBounceOff;
-    private Bitmap mBitmapIcMakeBounceOn;
-
-    private Bitmap mBitmapIcReDrawOff;
-    private Bitmap mBitmapIcReDrawOn;
-
-    private Bitmap mBitmapIcAddPicOn;
-    private Bitmap mBitmapIcAddPicOff;
-
-    private Bitmap mBitmapIcRemovePicOn;
-    private Bitmap mBitmapIcRemovePicOff;
-
-    private Bitmap mBitmapIcClearAllPicOn;
-    private Bitmap mBitmapIcClearAllPicOff;
-
-    private Bitmap mBitmapIcSoundOn;
-    private Bitmap mBitmapIcSoundOff;
-
-    private Bitmap mBitmapIcShowTextOn;
-    private Bitmap mBitmapIcShowTextOff;
-
-    private Bitmap mBitmapIcRdmBounceAngleModOn;
-    private Bitmap mBitmapIcRdmBounceAngleModOff;
-
-    private Bitmap mBitmapIcFireworksModOn;
-    private Bitmap mBitmapIcFireworksModOff;
-
-    private Bitmap mBitmapIcIncreaseSpeedPicOn;
-    private Bitmap mBitmapIcIncreaseSpeedPicOff;
-
-    private Bitmap mBitmapIcDecreaseSpeedPicOn;
-    private Bitmap mBitmapIcDecreaseSpeedPicOff;
-
-    private Bitmap mBitmapIcStopPicOn;
-    private Bitmap mBitmapIcStopPicOff;
-
-    private Bitmap mBitmapIcRedrawSelectedPicOn;
-    private Bitmap mBitmapIcRedrawSelectedPicOff;
-
-    private Bitmap mBitmapIcChangeColorOn;
-    private Bitmap mBitmapIcChangeColorOff;
-
-
-//    private MySprite mPic1;
-//    private MySprite mPic2;
-//    private MySprite mPic3;
-//    private MySprite mPic4;
-
     private ArrayList<MySprite> tabPics;
     private ArrayList<Bitmap> mBitmapTab;
-    private ArrayList<Bitmap> bitmapTabForOnBtn;
-    private ArrayList<Bitmap> bitmapTabForOffBtn;
-    private ArrayList<Boolean> booleanTabForBtnState;
 
     private String textNbTouchTotal;
     private String textNbTouchPerSecondes;
@@ -136,22 +91,6 @@ public class MyCustomView extends View implements View.OnTouchListener {
     private String text7;
     private String text8;
     private String text9;
-
-    private Boolean isBounceOn;
-    private Boolean isReDrawOn;
-    private Boolean isAddPicOn;
-    private Boolean isRemovePicOn;
-    private Boolean isClearAllPicOn;
-    private Boolean isSoundOn;
-    private Boolean isTextDebugIsShown;
-    private Boolean isRmdBounceAngleModOn;
-    private Boolean isMyMenuisShown;
-    private Boolean isFireworksModOn;
-    private Boolean isIncreaseSpeedOn;
-    private Boolean isDecreaseSpeedOn;
-    private Boolean isStopPicOff;
-    private Boolean isReDrawSelectedSpriteOn;
-    private Boolean isChangeColorOn;
 
     //    private Map<String, Boolean> booleanTabForBtnState ;
     private MyMenu myMenu;
@@ -212,8 +151,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
         super.setOnTouchListener(this);     //Appel l'init du parent
 
 //        mMediaPlayerForPic1 = MediaPlayer.create(getContext(), R.raw.oui);
-//        mMediaPlayerForWoW = MediaPlayer.create(getContext(), R.raw.wowguy);   //on crée le player de musique, on donne le context qui sert a savoir où le créer quand il est appeler, puis on lui passe le son a jouer
-
+//        mMediaPlayerForWoW = MediaPlayer.create(getContext(), R.raw.wowguy);
         mMediaPlayerForPic1 = MediaPlayer.create(getContext(), R.raw.deniah);
         mMediaPlayerForPic2 = MediaPlayer.create(getContext(), R.raw.wowguy);
         mPaint = new Paint();       // init
@@ -241,9 +179,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
         initMyBtn();
         initMySprite();
 
-        //TODO faire objet Plateau de jeu, pour pouvoir avoir d'autre "Images" que celle de base
-        //TODO Tableau a deux dimention. une ligne pour chaque tableau de "MySprites"
-        //TODO ex: plateau.getTabsSprites(0,0).getXStart   
+
 
     }
 
@@ -638,7 +574,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
     }
 
     private void reDrawMySelectedMySpriteHere(int x, int y) {
-        if (selectedMySprite != null && booleanTabForBtnState.get(13)) {
+        if (selectedMySprite != null && myMenu.getMyBtnTab().get(13).getState()) {
             selectedMySprite.setxStart(x);
             selectedMySprite.setyStart(y);
             selectedMySprite.setxSpeed(0);
