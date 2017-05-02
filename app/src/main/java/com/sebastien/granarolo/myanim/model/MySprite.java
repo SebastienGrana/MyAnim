@@ -17,6 +17,10 @@ public class MySprite {
     private int mSpriteHeight;
     private Bitmap mBitmap;
 
+    private float angle;
+    private float mass;
+    private float speed;
+
 
 
     private boolean isPicTouchedOnX;
