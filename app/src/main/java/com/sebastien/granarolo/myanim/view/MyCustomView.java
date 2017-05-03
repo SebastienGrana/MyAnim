@@ -19,6 +19,7 @@ import android.view.WindowManager;
 
 import com.sebastien.granarolo.myanim.R;
 import com.sebastien.granarolo.myanim.model.MyBtn;
+import com.sebastien.granarolo.myanim.model.MyBtnData;
 import com.sebastien.granarolo.myanim.model.MyMenu;
 import com.sebastien.granarolo.myanim.model.MySprite;
 
@@ -27,22 +28,25 @@ import java.util.Random;
 import java.util.logging.Handler;
 
 /**
- * Created by hb on 12/04/2017.
+ * Created by seb on 12/04/2017.
  */
-/*
 
 
-        //TODO faire objet Plateau de jeu, pour pouvoir avoir d'autre "Images" que celle de base
-        //TODO Tableau a deux dimention. une ligne pour chaque tableau de "MySprites"
-        //TODO ex: plateau.getTabsSprites(0,0).getXStart
+//TODO faire objet Plateau de jeu, pour pouvoir avoir d'autre "Images" que celle de base ainsi que d'autres Menu
+//TODO Tableaux a deux dimention. Une ligne pour chaque tableau de "MySprites"
+//TODO 2em Tableau: une ligne pour chaque Object MyMenu
+//TODO ex: plateau.getTabsSprites(0,0).getXStart
+//TODO Mettre Graviter, effets pour le plateau
 
-        //TODO Faire le Controller dans Le mvC !!
-        //TODO Ne pas utiliser de variable de classe, tout passer en parrametre de la fonction !!!
-        //TODO implémenter: le nouveau system de détection de colision, le nouveau system de déplacement, les angles des mySprite, la vitesse en float et le poid
+//TODO Faire le Controller dans Le mvC !!
+//TODO Ne pas utiliser de variable de classe, tout passer en parrametre de la fonction !!!
+//TODO implémenter: le nouveau system de détection de colision, le nouveau system de déplacement, les angles des mySprite, la vitesse en float et le poid
 
-        //TODO refaire les méthodes de drawMyMenu et onClickOnMyMenu de simplement
+//TODO refaire les méthodes de drawMyMenu et onClickOnMyMenu de simplement
+//TODO faire plain de variable de function pour une meilleur compréhention  du oode
 
- */
+//TODO JAVADOC
+
 public class MyCustomView extends View implements View.OnTouchListener {
 
     private static final String TAG = "MyCustomView";
@@ -61,10 +65,11 @@ public class MyCustomView extends View implements View.OnTouchListener {
     private Bitmap mBitmapSpriteTeal;
     private Bitmap mBitmapSpriteOrange;
     private Bitmap mBitmapSpritePink;
-    private Bitmap mBitmapDefault;
+    private Bitmap mBitmapSpriteDefault;
     //    private Bitmap mBitmapIcSpriteMahhieu;
+
     private MyBtn showMyMenu;
-    private MyBtn makeBounce;
+    private MyBtnData makeBounce;
     private MyBtn reDraw;
     private MyBtn addPic;
     private MyBtn removePic;
@@ -80,52 +85,37 @@ public class MyCustomView extends View implements View.OnTouchListener {
     private MyBtn changeColor;
 
     private ArrayList<MySprite> tabPics;
-    private ArrayList<Bitmap> mBitmapTab;
+    private ArrayList<Bitmap> tabMBitmap;
+    private ArrayList<String> tabTextString;
+    private ArrayList<MyBtn> myBtnTab;
+    private ArrayList dataTabMyBtnBounce;
 
-    private String textNbTouchTotal;
-    private String textNbTouchPerSecondes;
-    private String textNbPic;
-    private String textNbTouchPerSecondesMax;
-    private String text5;
-    private String text6;
-    private String text7;
-    private String text8;
-    private String text9;
-
-    //    private Map<String, Boolean> booleanTabForBtnState ;
-    private MyMenu myMenu;
-    private MediaPlayer mMediaPlayerForPic1;
-    private MediaPlayer mMediaPlayerForPic2;
-    private Vibrator mVibrator;
-    private Random randomNumber = new Random();
-    private android.widget.Toast Toast;
-    private Display mDisplay;
-    private Point mSize;
-    private WindowManager windowMana;
-    private Handler mHandler;
-    private Runnable runnableUpdateCoor;
-    private SensorManager mSensorManager;
-    private Sensor mSensor;
-
-    private long starttime;
-    private long millis;
-
-    private int seconds;
-    private int minutes;
-    private int oldSeconds;
     private int newNbCollidePerSecondes;
-    private int veryOldSeconds;
-    private int compterFrame1;
     private int maxCollidePerSeconds;
-    private int compterTouch;
-    private int limiteFrame;
+
+    private int nbCollidePerSecondes;
     private int nbTouch;
     private int newNbTouch;
     private int intBool1;
-    private int nbCollidePerSecondes;
+    private int compterFrame1;
+
+    //        private Map<String, Boolean> booleanTabForBtnState ;
+    private MyMenu myMenuRight;
+    private MediaPlayer mMediaPlayerForPic1;
+    private MediaPlayer mMediaPlayerForPic2;
+    private Random randomNumber = new Random();
+    private Vibrator mVibrator;
+    private Runnable runnableUpdateCoor;
+//    private android.widget.Toast Toast;
+//    private Display mDisplay;
+//    private Point mSize;
+//    private WindowManager windowMana;
+//    private Handler mHandler;
+//    private SensorManager mSensorManager;
+//    private Sensor mSensor;
+
 
     private MySprite selectedMySprite;
-    private ArrayList<MyBtn> myBtnTab;
 
     /**
      * @param context
@@ -133,6 +123,8 @@ public class MyCustomView extends View implements View.OnTouchListener {
     public MyCustomView(Context context) {  //Constucteur de la view où on y init toutes les variables, objets et autres dimentions
         super(context);
         init();
+        initMyBtn();
+        initMySprite();
     }
 
     /**
@@ -142,6 +134,8 @@ public class MyCustomView extends View implements View.OnTouchListener {
     public MyCustomView(Context context, AttributeSet attrs) { //2em constructeur (je sais pas encore pourquoi ^^ )
         super(context, attrs);
         init();
+        initMyBtn();
+        initMySprite();
     }
 
     /**
@@ -158,26 +152,25 @@ public class MyCustomView extends View implements View.OnTouchListener {
         mPaint.setTextSize(40);     // on définit la taille de police
         mPaint2 = new Paint();       // Pour le text debug
         mPaint2.setTextSize(25);
-        starttime = 0;
+        nbTouch = 0;    //Compteur
+        nbCollidePerSecondes = 0;
+        maxCollidePerSeconds = 0;
+        newNbTouch = 0;
         nbCollidePerSecondes = 0;
         compterFrame1 = 0;
-        compterTouch = 0;
-        limiteFrame = 2;
-        maxCollidePerSeconds = 0;
-        nbTouch = 0;    //Compteur
+
         mVibrator = (Vibrator) getContext().getSystemService(Activity.VIBRATOR_SERVICE);
+
         tabPics = new ArrayList<MySprite>();
+        tabTextString = new ArrayList<String>();
         selectedMySprite = null;
 
         runnableUpdateCoor = new Runnable() {
             public void run() {
 
-                updateCoor();
+                updateCoor(tabPics);
             }
         };
-
-        initMyBtn();
-        initMySprite();
 
 
 
@@ -192,23 +185,29 @@ public class MyCustomView extends View implements View.OnTouchListener {
         mBitmapSpriteTeal = BitmapFactory.decodeResource(getResources(), R.drawable.ic_sprite_teal);
         mBitmapSpriteOrange = BitmapFactory.decodeResource(getResources(), R.drawable.ic_sprite_orange);
         mBitmapSpritePink = BitmapFactory.decodeResource(getResources(), R.drawable.ic_sprite_pink);
-        mBitmapDefault = BitmapFactory.decodeResource(getResources(), R.drawable.ic_sprite_default);
+        mBitmapSpriteDefault = BitmapFactory.decodeResource(getResources(), R.drawable.ic_sprite_default);
 //        mBitmapIcSpriteMahhieu = BitmapFactory.decodeResource(getResources(), R.drawable.ic_mahhieu);
 
-        mBitmapTab = new ArrayList<Bitmap>();
-        mBitmapTab.add(0, mBitmapSpritePurple);
-        mBitmapTab.add(1, mBitmapSpriteRed);
-        mBitmapTab.add(2, mBitmapSpriteYellow);
-        mBitmapTab.add(3, mBitmapSpriteGreen);
-        mBitmapTab.add(4, mBitmapSpriteBlue);
-        mBitmapTab.add(5, mBitmapSpriteTeal);
-        mBitmapTab.add(6, mBitmapSpriteOrange);
-        mBitmapTab.add(7, mBitmapSpritePink);
-        mBitmapTab.add(8, mBitmapDefault);
-//        mBitmapTab.add(5,mBitmapIcSpriteMahhieu);
+        tabMBitmap = new ArrayList<Bitmap>();
+        tabMBitmap.add(0, mBitmapSpritePurple);
+        tabMBitmap.add(1, mBitmapSpriteRed);
+        tabMBitmap.add(2, mBitmapSpriteYellow);
+        tabMBitmap.add(3, mBitmapSpriteGreen);
+        tabMBitmap.add(4, mBitmapSpriteBlue);
+        tabMBitmap.add(5, mBitmapSpriteTeal);
+        tabMBitmap.add(6, mBitmapSpriteOrange);
+        tabMBitmap.add(7, mBitmapSpritePink);
+        tabMBitmap.add(8, mBitmapSpriteDefault);
+//        tabMBitmap.add(5,mBitmapIcSpriteMahhieu);
     }
 
     private void initMyBtn() {
+        dataTabMyBtnBounce = new ArrayList();
+        dataTabMyBtnBounce.add(0, nbTouch);
+        dataTabMyBtnBounce.add(1, newNbTouch);
+        dataTabMyBtnBounce.add(2, nbCollidePerSecondes);
+        dataTabMyBtnBounce.add(3, maxCollidePerSeconds);
+
         showMyMenu = new MyBtn(
                 BitmapFactory.decodeResource(getResources(), R.drawable.ic_show_debug_screen_on),
                 BitmapFactory.decodeResource(getResources(), R.drawable.ic_show_debug_screen_off),
@@ -216,12 +215,13 @@ public class MyCustomView extends View implements View.OnTouchListener {
                 "Show Menu",
                 0);
 
-        makeBounce = new MyBtn(
+        makeBounce = new MyBtnData(
                 BitmapFactory.decodeResource(getResources(), R.drawable.ic_make_bounce_on),
                 BitmapFactory.decodeResource(getResources(), R.drawable.ic_make_bounce_off),
                 false,
                 "Bounce",
-                2);
+                2,
+                dataTabMyBtnBounce);
         reDraw = new MyBtn(
                 BitmapFactory.decodeResource(getResources(), R.drawable.ic_re_draw_on),
                 BitmapFactory.decodeResource(getResources(), R.drawable.ic_re_draw_off),
@@ -319,7 +319,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
         myBtnTab.add(13, redrawSelectedPic);
         myBtnTab.add(14, changeColor);
         //Objet menu comportant 3 Tableaux : 2 Tableau de Bitmap et 1 de Boolean
-        myMenu = new MyMenu(myBtnTab, "right");
+        myMenuRight = new MyMenu(myBtnTab, "right");
     }
 
 
@@ -327,21 +327,15 @@ public class MyCustomView extends View implements View.OnTouchListener {
     protected void onDraw(Canvas canvas) {          //La fonction/méthode qui sert a crée des elements (Textview Imageview
         super.onDraw(canvas);
 
-        drawTexts(canvas);
-        drawMyMenu(canvas, myMenu);
-        drawMySprites(canvas);
-        reDrawLostPic();
+        drawTexts(canvas, tabTextString, mPaint, mPaint2);
+        drawMyMenu(canvas, myMenuRight, mPaint, screenWidth, screenHeight);
+        drawMySprites(canvas, tabPics, mPaint);
+        reDrawLostPic(tabPics, tabMBitmap, screenWidth, screenHeight);
 //        updateCoor();
         runnableUpdateCoor.run();
 
-        increaseCompterFrame1AndSetDefaultBitmap();
-//        if (compterTouch > 60) {
-//            compterTouch = 0;
-//        }
-
-
+        increaseCompterFrame1AndSetDefaultBitmap(tabPics, tabMBitmap, selectedMySprite);
         invalidate();
-//        compterTouch++;
     }
 
 
@@ -376,33 +370,33 @@ public class MyCustomView extends View implements View.OnTouchListener {
 //            Toast.makeText(view.getContext(), myText, Toast.LENGTH_SHORT).show();
 //                addNewMySpriteOnTabPics(x, y);
 //                setDefaultBitmapForAllPic(tabPics);
-                onClickOnMySprite(x, y, motionEvent);
-                reDrawMySelectedMySpriteHere(x, y);
+                onClickOnMySprite(x, y, motionEvent, tabPics);
+                reDrawMySelectedMySpriteHere(x, y, selectedMySprite);
 
             }
 
-            if (myMenu.getMyBtnTab().get(0).getState()) {   //Si le menu de myMenu est afficher
+            if (myMenuRight.getMyBtnTab().get(0).getState()) {   //Si le menu de myMenuRight est afficher
 
-                if (x >= (screenWidth - myMenu.getMyBtnTab().get(0).getPicOff().getWidth() - mMarginPic * 2)) {
+                if (x >= (screenWidth - myMenuRight.getMyBtnTab().get(0).getPicOff().getWidth() - mMarginPic * 2)) {
 
 
-                    onClickOnMyMenuBtn(x, y, myMenu);
+                    onClickOnMyMenuBtn(x, y, myMenuRight);
 
                     setScreenValues();
 
 
                 }
 
-            } else { //Si le myMenu n'est pas afficher
-                if ((x >= (screenWidth - myMenu.getMyBtnTab().get(0).getPicOff().getWidth() - mMarginPic * 2)) &&
-                        (y <= (myMenu.getMyBtnTab().get(0).getPicOff().getHeight()) + mMarginPic * 2)) {
+            } else { //Si le myMenuRight n'est pas afficher
+                if ((x >= (screenWidth - myMenuRight.getMyBtnTab().get(0).getPicOff().getWidth() - mMarginPic * 2)) &&
+                        (y <= (myMenuRight.getMyBtnTab().get(0).getPicOff().getHeight()) + mMarginPic * 2)) {
 
 
-                    onClickOnMyMenuBtn(x, y, myMenu);
+                    onClickOnMyMenuBtn(x, y, myMenuRight);
 
                     setScreenValues();
 
-                    if (!myMenu.getMyBtnTab().get(1).getState()) {
+                    if (!myMenuRight.getMyBtnTab().get(1).getState()) {
                         nbTouch = newNbTouch;
                         newNbTouch = 0;
                     }
@@ -419,7 +413,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      *
      */
-    public void updateCoor() {
+    public void updateCoor(ArrayList<MySprite> tabPics) {
 
         for (int compterFrame = 0; compterFrame < 15; compterFrame++) {
             if (compterFrame == 14) {
@@ -428,9 +422,9 @@ public class MyCustomView extends View implements View.OnTouchListener {
                 if (tabPics.size() > 1) {
                     for (int i = 0; i <= tabPics.size() - 1; i++) {
                         moveImg(tabPics.get(i));
-                        makeBoundIfCollideOnWall(tabPics.get(i));
+                        makeBoundIfCollideOnWall(tabPics.get(i), screenWidth, screenHeight);
 
-                        if (myMenu.getMyBtnTab().get(1).getState()) {
+                        if (myMenuRight.getMyBtnTab().get(1).getState()) {
                             for (int j = (i + 1); j <= tabPics.size() - 1; j++) {
                                 makeBoundIfCollideOnObject(tabPics.get(i), tabPics.get(j));
                             }
@@ -438,7 +432,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
                     }
                 } else if (tabPics.size() == 1) {
                     moveImg(tabPics.get(0));
-                    makeBoundIfCollideOnWall(tabPics.get(0));
+                    makeBoundIfCollideOnWall(tabPics.get(0), screenWidth, screenHeight);
                 }
 //        compterTouch = 0;
 //            }
@@ -460,7 +454,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
         if (isObjectCollided(mObject1, mObject2)) {
 
             doActionsWhenCollide(mObject1, mObject2);
-            playSoundCollideAh();
+            playSoundCollideAh(mMediaPlayerForPic1);
             return true;
 
         } else {
@@ -478,13 +472,13 @@ public class MyCustomView extends View implements View.OnTouchListener {
         increaseNbCollideIfBouceOn();
 
         setTouchedOnXY(mObject1);
-        setRandomBitmapForMSprite(mObject1);
-        setRandomSpeedForPicIfActivated(mObject1);
+        setRandomBitmapForMSprite(mObject1, tabMBitmap, randomNumber);
+        setRandomSpeedForPicIfActivated(mObject1, randomNumber);
         reDrawPicWhenCollideIfActivated(mObject1);
 
         setTouchedOnXY(mObject2);
-        setRandomBitmapForMSprite(mObject2);
-        setRandomSpeedForPicIfActivated(mObject2);
+        setRandomBitmapForMSprite(mObject2, tabMBitmap, randomNumber);
+        setRandomSpeedForPicIfActivated(mObject2, randomNumber);
         reDrawPicWhenCollideIfActivated(mObject2);
 
     }
@@ -527,11 +521,11 @@ public class MyCustomView extends View implements View.OnTouchListener {
      * @param y
      * @return
      */
-    private Boolean doActionWhenClickOnMySprite(int x, int y, int id) {
+    private Boolean doActionWhenClickOnMySprite(int x, int y, int id, ArrayList<MySprite> tabPics, MySprite selectedMySprite) {
 
 //                reDrawPicFuther(tabPics.get(i));
 //                playSoundCollideWow();
-        tabPics.get(id).setmBitmap(getRandomBitmap());
+        tabPics.get(id).setmBitmap(getRandomBitmap(tabMBitmap, randomNumber));
         selectedMySprite = tabPics.get(id);
 
 
@@ -541,7 +535,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
     }
 
 
-    private Boolean onClickOnMySprite(int x, int y, MotionEvent motionEvent) {
+    private Boolean onClickOnMySprite(int x, int y, MotionEvent motionEvent, ArrayList<MySprite> tabPics) {
 
         int grosDoigts = 20;
         int mSpriteX;
@@ -560,21 +554,21 @@ public class MyCustomView extends View implements View.OnTouchListener {
                     (y > mSpriteY - grosDoigts) && (y <= mSpriteEndY + grosDoigts)) {
 
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    doActionWhenClickOnMySprite(x, y, i);
+                    doActionWhenClickOnMySprite(x, y, i, tabPics, selectedMySprite);
 
                 }/* else if (motionEvent.getAction() == MotionEvent.ACTION_BUTTON_PRESS) {
 //                    reDrawMySelectedMySpriteHere(x, y);
                 }*/
                 return true;
             } else {
-                setDefaultBitmapForAllPic(tabPics);
+                setDefaultBitmapForAllPic(tabPics, tabMBitmap, selectedMySprite);
             }
         }
         return null;
     }
 
-    private void reDrawMySelectedMySpriteHere(int x, int y) {
-        if (selectedMySprite != null && myMenu.getMyBtnTab().get(13).getState()) {
+    private void reDrawMySelectedMySpriteHere(int x, int y, MySprite selectedMySprite) {
+        if (selectedMySprite != null && myMenuRight.getMyBtnTab().get(13).getState()) {
             selectedMySprite.setxStart(x);
             selectedMySprite.setyStart(y);
             selectedMySprite.setxSpeed(0);
@@ -600,16 +594,16 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      *
      */
-    private void increaseCompterFrame1AndSetDefaultBitmap() {
-        compterFrame1++;
-//        compterTouch++;
+    private void increaseCompterFrame1AndSetDefaultBitmap(ArrayList<MySprite> tabPics, ArrayList<Bitmap> tabMBitmap, MySprite selectedMySprite) {
 
         //si le compteur est = à 15  /et/  si le rebond est On  /et/  si le Fireworks mod est On
-        if (compterFrame1 == 15 && myMenu.getMyBtnTab().get(8).getState()) {
-            setDefaultBitmapForAllPic(tabPics);
+        if (compterFrame1 == 15 && myMenuRight.getMyBtnTab().get(8).getState()) {
+            setDefaultBitmapForAllPic(tabPics, tabMBitmap, selectedMySprite);
             compterFrame1 = 0;
         } else if (compterFrame1 > 15) {
             compterFrame1 = 0;
+        } else {
+            compterFrame1 ++;
         }
     }
 
@@ -619,7 +613,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
      */
     public Boolean reDrawPicWhenCollideIfActivated(MySprite mPic) {
 
-        if (myMenu.getMyBtnTab().get(2).getState()) {
+        if (myMenuRight.getMyBtnTab().get(2).getState()) {
 
             if (!mPic.isPicTouchedOnX() && !mPic.isPicTouchedOnY()) {
                 mPic.setxStart(mPic.getxStart() + 17);
@@ -678,17 +672,18 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      *
      */
-    private void reDrawLostPic() {
+    private void reDrawLostPic(ArrayList<MySprite> tabPics, ArrayList<Bitmap> tabMBitmap, int screenWidth, int screenHeight) {
         MySprite myPic;
+        int defaultPic = tabMBitmap.size() - 1;
         for (int i = 0; i < tabPics.size(); i++) {
             myPic = tabPics.get(i);
 
-            if ((myPic.getxStart() + mBitmapDefault.getWidth() > screenWidth + 50 && myPic.getyStart() + mBitmapDefault.getHeight() > screenHeight + 50) ||
-                    (myPic.getxStart() + mBitmapDefault.getWidth() < 0 - 50 && myPic.getyStart() + mBitmapDefault.getHeight() < 0 - 50)) {
+            if ((myPic.getxStart() + tabMBitmap.get(defaultPic).getWidth() > screenWidth + 50 && myPic.getyStart() + tabMBitmap.get(defaultPic).getHeight() > screenHeight + 50) ||
+                    (myPic.getxStart() + tabMBitmap.get(defaultPic).getWidth() < 0 - 50 && myPic.getyStart() + tabMBitmap.get(defaultPic).getHeight() < 0 - 50)) {
 
                 myPic.setxStart(screenWidth / 2);
                 myPic.setyStart(screenHeight / 2);
-                playSoundCollideWow();
+                playSoundCollideWow(mMediaPlayerForPic2);
 
             }
         }
@@ -698,33 +693,33 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      * @param myPic
      */
-    private void makeBoundIfCollideOnWall(MySprite myPic) {
+    private void makeBoundIfCollideOnWall(MySprite myPic, int screenWidth, int screenHeight) {
 
         if (!myPic.isPicTouchedOnX()) {
             if ((myPic.getxStart() >= (screenWidth - myPic.getmSpriteWidth()))) {
                 myPic.setPicTouchedOnX(true);
-                setRandomBitmapForMSprite(myPic);
-                setRandomSpeedForPicIfActivated(myPic);
+                setRandomBitmapForMSprite(myPic, tabMBitmap, randomNumber);
+                setRandomSpeedForPicIfActivated(myPic, randomNumber);
             }
         } else if (myPic.isPicTouchedOnX()) {
             if ((myPic.getxStart() <= 0)) {
                 myPic.setPicTouchedOnX(false);
-                setRandomBitmapForMSprite(myPic);
-                setRandomSpeedForPicIfActivated(myPic);
+                setRandomBitmapForMSprite(myPic, tabMBitmap, randomNumber);
+                setRandomSpeedForPicIfActivated(myPic, randomNumber);
             }
         }
 
         if (!myPic.isPicTouchedOnY()) {
             if ((myPic.getyStart() >= ((screenHeight) - myPic.getmSpriteHeight()))) {
                 myPic.setPicTouchedOnY(true);
-                setRandomBitmapForMSprite(myPic);
-                setRandomSpeedForPicIfActivated(myPic);
+                setRandomBitmapForMSprite(myPic, tabMBitmap, randomNumber);
+                setRandomSpeedForPicIfActivated(myPic, randomNumber);
             }
         } else if (myPic.isPicTouchedOnY()) {
             if ((myPic.getyStart() <= 0)) {
                 myPic.setPicTouchedOnY(false);
-                setRandomBitmapForMSprite(myPic);
-                setRandomSpeedForPicIfActivated(myPic);
+                setRandomBitmapForMSprite(myPic, tabMBitmap, randomNumber);
+                setRandomSpeedForPicIfActivated(myPic, randomNumber);
             }
         }
     }
@@ -767,9 +762,9 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      *
      */
-    public void playSoundCollideAh() {
+    public void playSoundCollideAh(MediaPlayer mMediaPlayerForPic1) {
         //on joue la musique
-        if (myMenu.getMyBtnTab().get(6).getState()) { //si le son de rebond est acctivé
+        if (myMenuRight.getMyBtnTab().get(6).getState()) { //si le son de rebond est acctivé
 
             if (mMediaPlayerForPic1.isPlaying()) {     //si la musique est fini
                 mMediaPlayerForPic1.stop();                    //on stop le lecteur
@@ -784,16 +779,18 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      *
      */
-    public void playSoundCollideWow() {
+    public void playSoundCollideWow(MediaPlayer mMediaPlayerForPic2) {
 
-        if (mMediaPlayerForPic2.isPlaying()) {     //si la musique est fini
-            mMediaPlayerForPic2.stop();                    //on stop le lecteur
-            mMediaPlayerForPic2.reset();                   //on le vide
-            mMediaPlayerForPic2 = MediaPlayer.create(getContext(), R.raw.wowguy); // on reremplis
+        if (myMenuRight.getMyBtnTab().get(6).getState()) { //si le son de rebond est acctivé
+
+            if (mMediaPlayerForPic2.isPlaying()) {     //si la musique est fini
+                mMediaPlayerForPic2.stop();                    //on stop le lecteur
+                mMediaPlayerForPic2.reset();                   //on le vide
+                mMediaPlayerForPic2 = MediaPlayer.create(getContext(), R.raw.wowguy); // on reremplis
+            }
+
+            mMediaPlayerForPic2.start(); // on joue
         }
-
-        mMediaPlayerForPic2.start(); // on joue
-
     }
 
     /**
@@ -815,7 +812,9 @@ public class MyCustomView extends View implements View.OnTouchListener {
      *
      */
     private void increaseNbCollideIfBouceOn() {
-        if (myMenu.getMyBtnTab().get(1).getState()) { //si le rebond sur les object sont acctiver
+//Todo tableau
+        int compterTouch = 0;
+        if (myMenuRight.getMyBtnTab().get(1).getState()) { //si le rebond sur les object sont acctiver
             compterTouch++;
             newNbTouch = newNbTouch + compterTouch;
             newNbCollidePerSecondes = newNbCollidePerSecondes + compterTouch;
@@ -841,8 +840,8 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      * @param myPic
      */
-    public void setRandomSpeedForPicIfActivated(MySprite myPic) {
-        if (myMenu.getMyBtnTab().get(9).getState()) {//si le bouton est acctiver
+    public void setRandomSpeedForPicIfActivated(MySprite myPic, Random randomNumber) {
+        if (myMenuRight.getMyBtnTab().get(9).getState()) {//si le bouton est acctiver
             myPic.setySpeed(randomNumber.nextInt(9)); // vitesse en 0 et 8
             myPic.setxSpeed(randomNumber.nextInt(9)); // vitesse en 0 et 8
         }
@@ -853,26 +852,28 @@ public class MyCustomView extends View implements View.OnTouchListener {
      * @param mPic
      * @return
      */
-    private Bitmap getOtherBitmap(MySprite mPic) {
+    private Bitmap getOtherBitmap(MySprite mPic, ArrayList<Bitmap> tabMBitmap) {
+        int defaultPic = tabMBitmap.size() - 1;
+
         if (!mPic.isPicTouchedOnX() && !mPic.isPicTouchedOnY()) {
-            return mBitmapSpriteRed;
+            return tabMBitmap.get(0);
         } else if (!mPic.isPicTouchedOnX() && mPic.isPicTouchedOnY()) {
-            return mBitmapSpriteYellow;
+            return tabMBitmap.get(1);
         } else if (mPic.isPicTouchedOnX() && !mPic.isPicTouchedOnY()) {
-            return mBitmapSpriteGreen;
+            return tabMBitmap.get(2);
         } else if (mPic.isPicTouchedOnX() && mPic.isPicTouchedOnY()) {
-            return mBitmapSpritePurple;
+            return tabMBitmap.get(3);
         }
-        return mBitmapDefault;
+        return tabMBitmap.get(defaultPic);
     }
 
 
     /**
      * @return
      */
-    private Bitmap getRandomBitmap() {
+    private Bitmap getRandomBitmap(ArrayList<Bitmap> tabMBitmap, Random randomNumber) {
 
-        return mBitmapTab.get(randomNumber.nextInt(mBitmapTab.size() - 1));
+        return tabMBitmap.get(randomNumber.nextInt(tabMBitmap.size() - 1));
     }
 
 
@@ -880,9 +881,9 @@ public class MyCustomView extends View implements View.OnTouchListener {
      * @param mSprite
      * @return
      */
-    private Boolean setRandomBitmapForMSprite(MySprite mSprite) {
-        if (myMenu.getMyBtnTab().get(14).getState()) {
-            mSprite.setmBitmap(mBitmapTab.get(randomNumber.nextInt(mBitmapTab.size() - 1)));
+    private Boolean setRandomBitmapForMSprite(MySprite mSprite, ArrayList<Bitmap> tabMBitmap, Random randomNumber) {
+        if (myMenuRight.getMyBtnTab().get(14).getState()) {
+            mSprite.setmBitmap(tabMBitmap.get(randomNumber.nextInt(tabMBitmap.size() - 1)));
         }
         return true;
     }
@@ -892,10 +893,10 @@ public class MyCustomView extends View implements View.OnTouchListener {
      * @param mTabSprite
      * @return
      */
-    private Boolean setDefaultBitmapForAllPic(ArrayList<MySprite> mTabSprite) {
+    private Boolean setDefaultBitmapForAllPic(ArrayList<MySprite> mTabSprite, ArrayList<Bitmap> tabMBitmap, MySprite selectedMySprite) {
         for (int i = 0; i < mTabSprite.size(); i++) {
             if (mTabSprite.get(i) != selectedMySprite) {
-                mTabSprite.get(i).setmBitmap(mBitmapTab.get(mBitmapTab.size() - 1));
+                mTabSprite.get(i).setmBitmap(tabMBitmap.get(tabMBitmap.size() - 1));
             }
         }
         return true;
@@ -906,16 +907,17 @@ public class MyCustomView extends View implements View.OnTouchListener {
      * @param startX
      * @param startY
      */
-    private void addNewMySpriteOnTabPics(int startX, int startY) {
+    private void addNewMySpriteOnTabPics(int startX, int startY, ArrayList<MySprite> tabPics, Random randomNumber, ArrayList<Bitmap> tabMBitmap) {
+        int defaultPic = tabMBitmap.size() - 1;
         tabPics.add(
                 new MySprite(
                         startX,  // Position en X
                         startY,  // Position en Y
                         randomNumber.nextInt(5) + 3, // sa Vitesse en X
                         randomNumber.nextInt(5) + 3, // sa Vitesse en Y
-                        mBitmapSpriteRed.getWidth(), // sa Largeur en X
-                        mBitmapSpriteRed.getHeight(), // sa Hauteur en Y
-                        mBitmapTab.get(mBitmapTab.size() - 1), //l'image du sprite (ici la noir)
+                        tabMBitmap.get(defaultPic).getWidth(), // sa Largeur en X
+                        tabMBitmap.get(defaultPic).getHeight(), // sa Hauteur en Y
+                        tabMBitmap.get(defaultPic), //l'image du sprite (ici la noir)
                         getRandomBool(),    //sence de déplacement en X (0 droite, 1 gauche)
                         getRandomBool()    //sence de déplacement en Y (0 haut, 1 bas)
                        /*, (new MediaPlayer()).create(
@@ -942,7 +944,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      *
      */
-    private void removeLastMySpriteOnTabPics() { //enleve le dernier sprite
+    private void removeLastMySpriteOnTabPics(ArrayList<MySprite> tabPics) { //enleve le dernier sprite
         if (tabPics.size() > 0) {
             tabPics.remove(tabPics.size() - 1);
         }
@@ -952,7 +954,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      *
      */
-    private void clearAllOnTabPics() {//enleve tout les sprites
+    private void clearAllOnTabPics(ArrayList<MySprite> tabPics) {//enleve tout les sprites
         for (int i = tabPics.size() - 1; i >= 0; i--) {
             tabPics.remove(i);
         }
@@ -967,9 +969,9 @@ public class MyCustomView extends View implements View.OnTouchListener {
      */
     private Boolean onClickOnMyMenuBtn(int x, int y, MyMenu myMenu) { //écoute le click et fait une acction pour les boutons du MyMenu
 
-        if (!this.myMenu.getMyBtnTab().get(0).getState()) {
+        if (!this.myMenuRight.getMyBtnTab().get(0).getState()) {
 
-            doActionForBtn(myMenu.getMyBtnTab().get(0), 0);
+            doActionForBtn(myMenu.getMyBtnTab().get(0), 0, tabPics);
 
             return true;
 
@@ -983,7 +985,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
                             (y >= (myMenu.getMyBtnTab().get(0).getPicOff().getWidth() - mMarginPic * 1)) &&
                             (y <= (myMenu.getMyBtnTab().get(0).getPicOff().getWidth() + mMarginPic * 2)))) {
 
-                        doActionForBtn(myMenu.getMyBtnTab().get(i), i);
+                        doActionForBtn(myMenu.getMyBtnTab().get(i), i, tabPics);
                         return true;
                     }
 
@@ -994,7 +996,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
                             (y <= ((myMenu.getMyBtnTab().get(i).getPicOff().getHeight() + (mMarginPic * 2)) * i) +
                                     (myMenu.getMyBtnTab().get(i).getPicOff().getHeight() + (mMarginPic * 2))))) {
 
-                        doActionForBtn(myMenu.getMyBtnTab().get(i), i);
+                        doActionForBtn(myMenu.getMyBtnTab().get(i), i, tabPics);
                         return true;
                     }
                 }
@@ -1008,7 +1010,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
      *
      */
     private void setScreenValues() { // récupere la hauteur et la largeur de lécrans si le MyMenu est ouvert ou non
-        if (!myMenu.getMyBtnTab().get(0).getState()) {
+        if (!myMenuRight.getMyBtnTab().get(0).getState()) {
 
 //            windowMana.getDefaultDisplay().getRealSize(mSize);
 //            screenWidth = mSize.x;
@@ -1029,7 +1031,7 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      * @param canvas
      */
-    private void drawMySprites(Canvas canvas) { // déssine tout les sprites
+    private void drawMySprites(Canvas canvas, ArrayList<MySprite> tabPics, Paint mPaint) { // déssine tout les sprites
 
         for (int i = 0; i <= tabPics.size() - 1; i++) {
 
@@ -1046,77 +1048,57 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      * @param canvas
      */
-    private void drawTexts(Canvas canvas) { // déssine tout les texts
+    private void drawTexts(Canvas canvas, ArrayList<String> tabTextString, Paint mPaint, Paint mPaint2) { // déssine tout les texts
+//TODO Tableeau pour le dessins des textes
+        int x = 50;
+        int y = 50;
 
-        textNbTouchTotal = "nombre de colisions total: " + nbTouch + " (+" + newNbTouch + ")";
-        textNbTouchPerSecondes = "nombre de colisions en cours: " + newNbTouch + " (" + nbCollidePerSecondes + "/s)";
-        textNbPic = "nombre d'images : " + tabPics.size();
-        textNbTouchPerSecondesMax = "nombre de colisions par seconds Max : " + maxCollidePerSeconds;
-//        textNbTouchPerSecondesMax = "rebond : " + myMenu.getBooleanTabBtnState().get(1);
-//        text5 = "isReDrawOn : " + myMenu.getBooleanTabBtnState().get(2);
-//            text5 = "isMyMenuisShown : " + myMenu.getBooleanTabBtnState().get(0);
-//            text6 = "Old ScreenWidth X: " + getWidth();
-//            text7 = "Old ScreenHeight Y: " + getHeight();
-//            text8 = "New ScreenWidth X: " + screenWidth;
-//            text9 = "New ScreenHeight Y: " + screenHeight;
-//            text5 = "" + isASecondIsPassed();
-
-        canvas.drawText(textNbPic, 50, 50, mPaint);
-
-        if (myMenu.getMyBtnTab().get(7).getState()) {
-
-//            canvas.drawColor(Color.GREEN);
-            canvas.drawText(textNbTouchPerSecondes, 50, 150, mPaint2);
-            canvas.drawText(textNbTouchTotal, 50, 200, mPaint2);
-            canvas.drawText(textNbTouchPerSecondesMax, 50, 250, mPaint2);
-//            canvas.drawText(textNbTouchPerSecondesMax, 50, 300, mPaint);
-//            canvas.drawText(text5, 50, 350, mPaint);
-//            canvas.drawText(text6, 50, 330, mPaint);
-//            canvas.drawText(text7, 50, 360, mPaint);
-//            canvas.drawText(text8, 50, 390, mPaint);
-//            canvas.drawText(text9, 50, 420, mPaint);
+        setText(tabTextString);
+        for (int i = 0; i < tabTextString.size(); i++) {
+            if (i == 0) {
+                canvas.drawText(tabTextString.get(i), x, y, mPaint);
+                y = y + 50;
+            } else if (myMenuRight.getMyBtnTab().get(7).getState()) {
+                y = y + 50;
+                canvas.drawText(tabTextString.get(i), x, y, mPaint2);
+            }
         }
+    }
+
+    private void setText(ArrayList<String> tabTextString) {
+        tabTextString.removeAll(tabTextString);
+        tabTextString.add(0, "nombre d'images : " + tabPics.size());
+        tabTextString.add(1, "nombre de colisions total: " + nbTouch + " (+" + newNbTouch + ")");
+        tabTextString.add(2, "nombre de colisions en cours: " + newNbTouch + " (" + nbCollidePerSecondes + "/s)");
+        tabTextString.add(3, "nombre de colisions par seconds Max : " + maxCollidePerSeconds);
+//        tabTextString.add(4, "Une seconde est passé: " + isASecondIsPassed());
     }
 
     /**
      * @return
      */
     public Boolean isASecondIsPassed() { // renvois vrais si une seconde est passer
+
+        int seconds = 0;
+        long starttime = 0;
+        int oldSeconds;
+        long millis;
+
         oldSeconds = seconds;
         millis = System.currentTimeMillis() - starttime;
         seconds = (int) (millis / 1000);
-        minutes = seconds / 60;
         seconds = seconds % 60;
         if (seconds > oldSeconds) {
             return true;
         }
         return false;
     }
-//    public Boolean isTowSecondsArePassed() {
-//            oldSeconds = seconds;
-//
-//        millis = System.currentTimeMillis() - starttime;
-//        seconds = (int) (millis / 1000);
-//        minutes = seconds / 60;
-////        seconds = seconds % 60;
-//        if (isASecondIsPassed()) {
-//            if (isASecondIsPassed()) {
-//
-//                return true;
-//            }
-//        }
-////        if (seconds - veryOldSeconds ==2) {
-////
-////        }
-//
-//        return false;
-//    }
 
     /**
      * @param canvas
      * @param myMenu
      */
-    private void drawMyMenu(Canvas canvas, MyMenu myMenu) { // déssine les icones du MyMenu
+    private void drawMyMenu(Canvas canvas, MyMenu myMenu, Paint mPaint, int screenWidth, int screenHeight) { // déssine les icones du MyMenu
         if (!myMenu.getMyBtnTab().get(0).getState()) {        //Si le menu debug n'est pas afficher
 
 //            mBitmapIcShowDebugScreenOn
@@ -1154,9 +1136,9 @@ public class MyCustomView extends View implements View.OnTouchListener {
                     0,
                     mPaint);
 //            canvas.drawBitmap(
-//                    myMenu.getBitmapTabBtnOn().get(0),
+//                    myMenuRight.getBitmapTabBtnOn().get(0),
 //                    screenWidth + mMarginPic,
-//                    myMenu.getBitmapTabBtnOn().get(0).getHeight() * 0 + mMarginPic,
+//                    myMenuRight.getBitmapTabBtnOn().get(0).getHeight() * 0 + mMarginPic,
 //                    mPaint);
 
             for (int i = 0; i < myMenu.getMyBtnTab().size(); i++) {    //Pour chaque icone a affichier Moins la première
@@ -1194,8 +1176,8 @@ public class MyCustomView extends View implements View.OnTouchListener {
      * @param myBtn
      * @param idMyBtn
      */
-    private void doActionForBtn(MyBtn myBtn, int idMyBtn) {
-
+    private void doActionForBtn(MyBtn myBtn, int idMyBtn, ArrayList<MySprite> tabPics) {
+//TODO ne plus utiliser, si possible, de variables local (ex :les regrouper dans un tableau)
         switch (idMyBtn) {
             case 0:     //Afficher le menu
                 myBtn.setState(!myBtn.getState());
@@ -1212,17 +1194,17 @@ public class MyCustomView extends View implements View.OnTouchListener {
                 myBtn.setState(!myBtn.getState());
                 break;
             case 3:     //Ajouter une image
-                addNewMySpriteOnTabPics(randomNumber.nextInt(screenWidth), randomNumber.nextInt(screenHeight));
+                addNewMySpriteOnTabPics(randomNumber.nextInt(screenWidth), randomNumber.nextInt(screenHeight), tabPics, randomNumber, tabMBitmap);
                 maxCollidePerSeconds = 0;
                 myBtn.setState(!myBtn.getState());
                 break;
             case 4:     //Supprimer la dernierre image
-                removeLastMySpriteOnTabPics();
+                removeLastMySpriteOnTabPics(tabPics);
                 maxCollidePerSeconds = 0;
                 myBtn.setState(!myBtn.getState());
                 break;
             case 5:     //Supprimer toute les images
-                clearAllOnTabPics();
+                clearAllOnTabPics(tabPics);
                 nbCollidePerSecondes = 0;
                 newNbTouch = 0;
                 maxCollidePerSeconds = 0;
@@ -1241,11 +1223,11 @@ public class MyCustomView extends View implements View.OnTouchListener {
                 myBtn.setState(!myBtn.getState());
                 break;
             case 10:     //Augmenter la vitesse de tout les images
-                increaseSpeed(1);
+                increaseSpeed(1, tabPics);
                 myBtn.setState(!myBtn.getState());
                 break;
             case 11:     //Diminuer la vitesse de tout les images
-                decreaseSpeed(1);
+                decreaseSpeed(1, tabPics);
                 myBtn.setState(!myBtn.getState());
                 break;
             case 12:     //Arraiter toute les images
@@ -1278,14 +1260,17 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      * @param nbIncrease
      */
-    private void increaseSpeed(int nbIncrease) {
+    private void increaseSpeed(int nbIncrease, ArrayList<MySprite> tabPics) {
+        MySprite mySprite;
         for (int i = 0; i <= tabPics.size() - 1; i++) {
 
-            if (tabPics.get(i).getxSpeed() >= 0) {
-                tabPics.get(i).setxSpeed(tabPics.get(i).getxSpeed() + nbIncrease);
+            mySprite = tabPics.get(i);
+
+            if (mySprite.getxSpeed() >= 0) {
+                mySprite.setxSpeed(mySprite.getxSpeed() + nbIncrease);
             }
-            if (tabPics.get(i).getySpeed() >= 0) {
-                tabPics.get(i).setySpeed(tabPics.get(i).getySpeed() + nbIncrease);
+            if (mySprite.getySpeed() >= 0) {
+                mySprite.setySpeed(mySprite.getySpeed() + nbIncrease);
             }
         }
     }
@@ -1293,14 +1278,16 @@ public class MyCustomView extends View implements View.OnTouchListener {
     /**
      * @param nbDecrease
      */
-    private void decreaseSpeed(int nbDecrease) {
+    private void decreaseSpeed(int nbDecrease, ArrayList<MySprite> tabPics) {
+        MySprite mySprite;
         for (int i = 0; i <= tabPics.size() - 1; i++) {
 
-            if (tabPics.get(i).getxSpeed() >= nbDecrease) {
-                tabPics.get(i).setxSpeed(tabPics.get(i).getxSpeed() - nbDecrease);
+            mySprite = tabPics.get(i);
+            if (mySprite.getxSpeed() >= nbDecrease) {
+                mySprite.setxSpeed(mySprite.getxSpeed() - nbDecrease);
             }
-            if (tabPics.get(i).getySpeed() >= nbDecrease) {
-                tabPics.get(i).setySpeed(tabPics.get(i).getySpeed() - nbDecrease);
+            if (mySprite.getySpeed() >= nbDecrease) {
+                mySprite.setySpeed(mySprite.getySpeed() - nbDecrease);
             }
         }
     }

@@ -14,7 +14,6 @@ public class MyBtn {
     private Boolean state;
     private String shortDescriptif;
     private int category;
-    private ArrayList mData;
 
     public MyBtn(Bitmap picOn, Bitmap picOff, Boolean state, String shortDescriptif, int category) {
         this.picOn = picOn;
@@ -22,15 +21,6 @@ public class MyBtn {
         this.state = state;
         this.shortDescriptif = shortDescriptif;
         this.category = category;
-    }
-
-    public MyBtn(Bitmap picOn, Bitmap picOff, Boolean state, String shortDescriptif, int category, ArrayList mData) {
-        this.picOn = picOn;
-        this.picOff = picOff;
-        this.state = state;
-        this.shortDescriptif = shortDescriptif;
-        this.category = category;
-        this.mData = mData;
     }
 
     public Bitmap getPicOn() {
@@ -71,13 +61,5 @@ public class MyBtn {
 
     public void setCategory(int category) {
         this.category = category;
-    }
-
-    public ArrayList getmData() {
-        return mData;
-    }
-
-    public void setmData(ArrayList mData) {
-        this.mData = mData;
     }
 }
